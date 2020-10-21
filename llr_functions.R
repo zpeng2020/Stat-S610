@@ -22,11 +22,13 @@ llr <- function(x, y, z, omega) {
 #' @return (numeric) scalar
 
 compute_f_hat <- function(z, x, y, omega) {
-  Wz <- diag(make_weight_matrix(z, x, omega))
+  Wz <- make_weight_matrix(z, x, omega)
   X <- make_predictor_matrix(x)
-  f_hat <- c(1, z) %*% solve(t(X) %*% apply(X, 2, function(X=X){X * Wz})) %*% t(X) %*% apply(as.matrix(y), 2, function(y=as.matrix(y)){y * Wz})
+  f_hat <- c(1, z) %*% solve(t(X) %*% sweep(X, 1, diag(Wz), FUN = "*")) %*% t(X) %*% diag(Wz) * y
   return(f_hat)
 }
+
+
 
 #' @param z (numeric) must be a scalar
 #' @param x (numeric) vector of arbitrary length
